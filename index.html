@@ -25,7 +25,16 @@ button,input,select,textarea{font-family:inherit}
 .view{display:none}.view.active{display:block}
 
 /* ── Topbar ────────────────────────────────────────── */
-#topbar{height:50px;min-height:50px;background:#111;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;padding:0 16px;gap:10px;flex-shrink:0}
+/* Safe-area-inset-top pushes content below the iPhone status bar clock/notch */
+#topbar{
+  min-height:50px;background:#111;border-bottom:1px solid #1e1e1e;
+  display:flex;align-items:center;gap:10px;flex-shrink:0;
+  /* Left/right padding + top safe area so nothing hides under the notch/clock */
+  padding: env(safe-area-inset-top, 0px) 16px 0 16px;
+  padding-top: max(env(safe-area-inset-top, 0px), 14px);
+  /* Height grows to accommodate safe area */
+  padding-bottom: 12px;
+}
 #tb-title{font-size:13px;font-weight:700;color:#e0e0e0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #period-btn{font-size:11px;background:#1a1a1a;border:1px solid #252525;color:#888;padding:5px 11px;border-radius:4px;cursor:pointer;transition:all .15s;white-space:nowrap}
 #period-btn:hover{border-color:#c41e3a;color:#e0e0e0}
@@ -75,12 +84,6 @@ button,input,select,textarea{font-family:inherit}
 /* ── Mobile sidebar overlay ───────────────────────── */
 #sb-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:49}
 #sb-overlay.show{display:block}
-
-/* ── Bottom nav (mobile only) ─────────────────────── */
-#bot-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:56px;background:#111;border-top:1px solid #1e1e1e;z-index:100;padding-bottom:env(safe-area-inset-bottom,0px)}
-.bn-btn{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;background:none;border:none;color:#454545;font-size:10px;cursor:pointer;padding:6px 2px;transition:color .15s;-webkit-tap-highlight-color:transparent;font-family:inherit}
-.bn-btn .bic{font-size:19px;line-height:1}
-.bn-btn.active{color:#c41e3a}
 
 /* ── Page header ────────────────────────────────────── */
 .ph{display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:12px;margin-bottom:20px}
@@ -216,19 +219,29 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
 /* ── Toast ───────────────────────────────────────────── */
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:16px;background:#2d9b6f;color:#fff;font-size:12px;font-weight:700;padding:9px 15px;border-radius:5px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;max-width:calc(100vw - 32px)}
 #toast.show{opacity:1;transform:translateY(0)}#toast.err{background:#c41e3a}
-@media(max-width:640px){#toast{bottom:calc(64px + env(safe-area-inset-bottom,0px))}}
 
 /* ── Responsive ──────────────────────────────────────── */
 @media(max-width:960px){.kg{grid-template-columns:1fr 1fr}.gcards{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
+
+/* Portrait phone — sidebar is a drawer, hamburger always visible */
 @media(max-width:640px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);transition:transform .25s}
+  /* Sidebar also needs safe-area padding at top so its header clears the notch */
+  .sb-brand{padding-top:max(env(safe-area-inset-top,0px),14px)}
   #sidebar.open{transform:translateX(0)}
   #mb-toggle{display:block}
-  #bot-nav{display:flex}
-  #content{padding:14px 12px;padding-bottom:calc(64px + env(safe-area-inset-bottom,0px))}
+  #content{padding:14px 12px;padding-bottom:calc(20px + env(safe-area-inset-bottom,0px))}
   .kg{grid-template-columns:1fr 1fr}.gcards{grid-template-columns:1fr}
   .fg{grid-template-columns:1fr}.fg .s2{grid-column:1}
   #gd-modal .modal{padding:16px}
+}
+
+/* Landscape phone — sidebar still a drawer (screen too narrow to share) */
+@media(max-width:900px) and (orientation:landscape){
+  #sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);transition:transform .25s;width:240px}
+  #sidebar.open{transform:translateX(0)}
+  #mb-toggle{display:block}
+  #content{padding:12px 16px}
 }
 </style>
 </head>
@@ -325,7 +338,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Month Summary</span></div><div class="pb" id="inc-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">Income Entries</span><span class="pm" id="inc-total"></span><button class="btn btn-ghost btn-sm" onclick="exportMonthCSV('income')">⬇ Export Month</button></div>
+        <div class="ph2"><span class="pt">Income Entries</span><span class="pm" id="inc-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
         <div class="tw"><table><thead><tr><th>Date</th><th>Source</th><th>Guest</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody id="inc-tb"></tbody></table></div>
       </div>
     </div>
@@ -341,7 +354,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Summary</span></div><div class="pb" id="ge-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">History</span><button class="btn btn-ghost btn-sm" onclick="exportMonthCSV('genexp')">⬇ Export Month</button></div>
+        <div class="ph2"><span class="pt">History</span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
         <div class="tw"><table><thead><tr><th>Period</th><th>Category</th><th>Amount</th></tr></thead><tbody id="ge-hist"></tbody></table></div>
       </div>
     </div>
@@ -364,7 +377,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Summary</span></div><div class="pb" id="ae-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">Expense Log</span><span class="pm" id="ae-total"></span><button class="btn btn-ghost btn-sm" onclick="exportMonthCSV('addexp')">⬇ Export Month</button></div>
+        <div class="ph2"><span class="pt">Expense Log</span><span class="pm" id="ae-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
         <div class="tw"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody id="ae-tb"></tbody></table></div>
       </div>
     </div>
@@ -388,7 +401,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Summary</span></div><div class="pb" id="cs-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">Purchase Log</span><span class="pm" id="cs-total"></span><button class="btn btn-ghost btn-sm" onclick="exportMonthCSV('consumables')">⬇ Export Month</button></div>
+        <div class="ph2"><span class="pt">Purchase Log</span><span class="pm" id="cs-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
         <div class="tw"><table><thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th></th></tr></thead><tbody id="cs-tb"></tbody></table></div>
       </div>
     </div>
@@ -501,15 +514,6 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
 
   </div><!-- /content -->
 </div><!-- /main -->
-
-<!-- ═══ BOTTOM NAV (mobile only) ══════════════════════ -->
-<nav id="bot-nav">
-  <button class="bn-btn active" data-v="dashboard" onclick="nav('dashboard')"><span class="bic">📊</span>Home</button>
-  <button class="bn-btn" data-v="income" onclick="nav('income')"><span class="bic">💰</span>Income</button>
-  <button class="bn-btn" data-v="addexp" onclick="nav('addexp')"><span class="bic">➕</span>Expenses</button>
-  <button class="bn-btn" data-v="guests" onclick="nav('guests')"><span class="bic">👥</span>Guests</button>
-  <button class="bn-btn" data-v="annual" onclick="nav('annual')"><span class="bic">📅</span>Report</button>
-</nav>
 </div><!-- /app -->
 
 <!-- ═══ MODALS ══════════════════════════════════════════ -->
@@ -525,6 +529,31 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <option value="10">October</option><option value="11">November</option><option value="12">December</option>
       </select></div>
     <div class="mbtns"><button class="btn btn-green" onclick="applyPeriod()">Apply</button><button class="btn btn-ghost" onclick="closeOv('period-modal')">Cancel</button></div>
+  </div>
+</div>
+
+<!-- Month CSV Export -->
+<div class="overlay" id="export-month-modal">
+  <div class="modal">
+    <h3>Export Month to CSV</h3>
+    <div style="font-size:12px;color:#555;margin-bottom:14px">Select a period and what you want to export.</div>
+    <div class="mrow">
+      <select id="ex-year"></select>
+      <select id="ex-month">
+        <option value="01">January</option><option value="02">February</option><option value="03">March</option>
+        <option value="04">April</option><option value="05">May</option><option value="06">June</option>
+        <option value="07">July</option><option value="08">August</option><option value="09">September</option>
+        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+      </select>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px">
+      <button class="btn btn-ghost" onclick="runExportMonth('income')">⬇ Income Entries</button>
+      <button class="btn btn-ghost" onclick="runExportMonth('genexp')">⬇ General Expenses</button>
+      <button class="btn btn-ghost" onclick="runExportMonth('addexp')">⬇ Additional Expenses</button>
+      <button class="btn btn-ghost" onclick="runExportMonth('consumables')">⬇ Consumables</button>
+      <button class="btn btn-green" onclick="runExportMonth('all')">⬇ Full Month Summary</button>
+    </div>
+    <div class="mbtns" style="margin-top:12px"><button class="btn btn-ghost" onclick="closeOv('export-month-modal')">Close</button></div>
   </div>
 </div>
 
@@ -912,8 +941,6 @@ function nav(id){
   var v=document.getElementById('view-'+id);if(v)v.classList.add('active');
   var b=document.querySelector('.sbi[data-v="'+id+'"]');if(b)b.classList.add('active');
   document.getElementById('tb-title').textContent=TITLES[id]||id;
-  // Update bottom nav
-  document.querySelectorAll('.bn-btn').forEach(function(bn){bn.classList.toggle('active',bn.dataset.v===id);});
   closeSidebar();
   renderView(id);
 }
@@ -1466,28 +1493,69 @@ function dlCsv(csv,fn){
   toast('CSV downloaded!');
 }
 
-// Export current period/month
-function exportMonthCSV(type){
-  var p=getP(),mn=periodLabel(),fn='QTVIS_'+type+'_'+CUR.y+'_'+CUR.m+'.csv';
+/* ── Month export modal ─────────────────────────────── */
+function openExportMonth(){
+  // Populate year selector dynamically
+  var ySel=document.getElementById('ex-year');
+  ySel.innerHTML='';
+  var now=new Date().getFullYear();
+  var years=[];
+  for(var y=now+2;y>=now-10;y--)years.push(y);
+  Object.keys(DB.periods).forEach(function(y){if(years.indexOf(+y)===-1)years.push(+y);});
+  years.sort(function(a,b){return b-a;});
+  years.forEach(function(y){var o=document.createElement('option');o.value=y;o.textContent=y;if(String(y)===CUR.y)o.selected=true;ySel.appendChild(o);});
+  document.getElementById('ex-month').value=CUR.m;
+  document.getElementById('export-month-modal').classList.add('open');
+}
+
+function runExportMonth(type){
+  var yr=document.getElementById('ex-year').value;
+  var mo=document.getElementById('ex-month').value;
+  var p=(DB.periods[yr]||{})[mo]||{income:[],genExp:{},addExp:[],cons:[]};
+  var mn=MOS[parseInt(mo,10)-1]+' '+yr;
+  var fn='QTVIS_'+yr+'_'+mo;
   var rows=[];
-  if(type==='income'){
-    rows=[['QTVIS — Income: '+mn],['Generated',new Date().toLocaleDateString('en-ZA')],[],['Date','Source','Guest','Description','Amount (R)']];
+
+  if(type==='income'||type==='all'){
+    rows.push(['QTVIS — Income: '+mn],['Generated',new Date().toLocaleDateString('en-ZA')],[],['Date','Source','Guest','Description','Amount (R)']);
     (p.income||[]).forEach(function(e){rows.push([e.date,e.source,guestName(e.guestId),e.description||'',(+e.amount).toFixed(2)]);});
-    rows.push([],['Total','',' ','',(tInc(p)).toFixed(2)]);
-  } else if(type==='genexp'){
-    rows=[['QTVIS — General Expenses: '+mn],['Generated',new Date().toLocaleDateString('en-ZA')],[],['Category','Amount (R)']];
-    DB.settings.genCats.forEach(function(cat){rows.push([cat,(p.genExp[cat]||0).toFixed(2)]);});
-    rows.push([],['Total',(tGen(p)).toFixed(2)]);
-  } else if(type==='addexp'){
-    rows=[['QTVIS — Additional Expenses: '+mn],['Generated',new Date().toLocaleDateString('en-ZA')],[],['Date','Category','Description','Amount (R)']];
-    (p.addExp||[]).forEach(function(e){rows.push([e.date,e.category,e.description||'',(+e.amount).toFixed(2)]);});
-    rows.push([],['Total','','',(tAdd(p)).toFixed(2)]);
-  } else if(type==='consumables'){
-    rows=[['QTVIS — Consumables: '+mn],['Generated',new Date().toLocaleDateString('en-ZA')],[],['Date','Item','Qty','Unit Cost (R)','Total (R)']];
-    (p.cons||[]).forEach(function(e){rows.push([e.date,e.item,e.qty,(+e.unit).toFixed(2),((+e.qty)*(+e.unit)).toFixed(2)]);});
-    rows.push([],['Total','','','',(tCons(p)).toFixed(2)]);
+    rows.push([],['Total Income','',' ','',(tInc(p)).toFixed(2)]);
+    if(type==='income'){dlCsv(mkCsv(rows),fn+'_income.csv');return;}
+    rows.push([],[],[]);
   }
-  dlCsv(mkCsv(rows),fn);
+
+  if(type==='genexp'||type==='all'){
+    rows.push(['QTVIS — General Expenses: '+mn],[],['Category','Amount (R)']);
+    DB.settings.genCats.forEach(function(cat){rows.push([cat,(p.genExp[cat]||0).toFixed(2)]);});
+    rows.push([],['Total General Exp',(tGen(p)).toFixed(2)]);
+    if(type==='genexp'){dlCsv(mkCsv(rows),fn+'_general_exp.csv');return;}
+    rows.push([],[]);
+  }
+
+  if(type==='addexp'||type==='all'){
+    rows.push(['QTVIS — Additional Expenses: '+mn],[],['Date','Category','Description','Amount (R)']);
+    (p.addExp||[]).forEach(function(e){rows.push([e.date,e.category,e.description||'',(+e.amount).toFixed(2)]);});
+    rows.push([],['Total Additional Exp','','',(tAdd(p)).toFixed(2)]);
+    if(type==='addexp'){dlCsv(mkCsv(rows),fn+'_additional_exp.csv');return;}
+    rows.push([],[]);
+  }
+
+  if(type==='consumables'||type==='all'){
+    rows.push(['QTVIS — Consumables: '+mn],[],['Date','Item','Qty','Unit Cost (R)','Total (R)']);
+    (p.cons||[]).forEach(function(e){rows.push([e.date,e.item,e.qty,(+e.unit).toFixed(2),((+e.qty)*(+e.unit)).toFixed(2)]);});
+    rows.push([],['Total Consumables','','','',(tCons(p)).toFixed(2)]);
+    if(type==='consumables'){dlCsv(mkCsv(rows),fn+'_consumables.csv');return;}
+    rows.push([],[]);
+  }
+
+  if(type==='all'){
+    // Add full month summary at end
+    var totExp=tExp(p),totInc=tInc(p);
+    rows.push(['═══ FULL MONTH SUMMARY: '+mn+' ═══'],[],
+      ['Income',totInc.toFixed(2)],['Total Expenses',totExp.toFixed(2)],
+      ['Net Profit/Loss',(totInc-totExp).toFixed(2)]);
+    dlCsv(mkCsv(rows),fn+'_full_summary.csv');
+  }
 }
 
 // Annual summary export
