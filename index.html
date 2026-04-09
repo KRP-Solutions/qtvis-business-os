@@ -25,14 +25,11 @@ button,input,select,textarea{font-family:inherit}
 .view{display:none}.view.active{display:block}
 
 /* ── Topbar ────────────────────────────────────────── */
-/* Safe-area-inset-top pushes content below the iPhone status bar clock/notch */
 #topbar{
   min-height:50px;background:#111;border-bottom:1px solid #1e1e1e;
   display:flex;align-items:center;gap:10px;flex-shrink:0;
-  /* Left/right padding + top safe area so nothing hides under the notch/clock */
   padding: env(safe-area-inset-top, 0px) 16px 0 16px;
   padding-top: max(env(safe-area-inset-top, 0px), 14px);
-  /* Height grows to accommodate safe area */
   padding-bottom: 12px;
 }
 #tb-title{font-size:13px;font-weight:700;color:#e0e0e0;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -53,6 +50,7 @@ button,input,select,textarea{font-family:inherit}
 #sync-chip:hover{border-color:#2d9b6f;color:#2d9b6f}
 #sync-chip.syncing{color:#d4892a;border-color:#503010}
 #sync-chip.err{color:#c41e3a;border-color:#501010}
+#sync-chip.signed-in{color:#2d9b6f;border-color:#1a3a1a}
 
 /* ── Install banner ────────────────────────────────── */
 #install-bar{display:none;background:#12122e;border-bottom:1px solid #1e1e5e;padding:6px 14px;align-items:center;gap:10px;font-size:11px;flex-shrink:0}
@@ -141,6 +139,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
 .btn-green{background:#2d9b6f;color:#fff;border-color:#2d9b6f}.btn-green:hover{background:#207050}
 .btn-danger{background:transparent;color:#c41e3a;border-color:#2a1010}.btn-danger:hover{background:#c41e3a;color:#fff}
 .btn-sm{padding:5px 10px;font-size:11px}.btn-xs{padding:3px 7px;font-size:10px}
+.btn-google{background:#fff;color:#3c3c3c;border-color:#3c3c3c;justify-content:center;width:100%}.btn-google:hover{background:#f5f5f5;border-color:#222}
 
 /* ── Chips ───────────────────────────────────────────── */
 .chip{display:inline-block;font-size:9px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:10px}
@@ -220,13 +219,28 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
 #toast{position:fixed;bottom:calc(20px + env(safe-area-inset-bottom,0px));right:16px;background:#2d9b6f;color:#fff;font-size:12px;font-weight:700;padding:9px 15px;border-radius:5px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .22s;pointer-events:none;max-width:calc(100vw - 32px)}
 #toast.show{opacity:1;transform:translateY(0)}#toast.err{background:#c41e3a}
 
+/* ── Quick-preset buttons ───────────────────────────── */
+.preset-btns{display:flex;gap:5px;flex-wrap:wrap;margin-bottom:14px}
+.preset-btn{font-size:10px;padding:4px 9px;border-radius:3px;border:1px solid #242424;background:transparent;color:#484848;cursor:pointer;font-family:inherit;transition:all .12s}
+.preset-btn:hover{border-color:#c41e3a;color:#e0e0e0}
+
+/* ── Range modal grid ───────────────────────────────── */
+.range-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.range-from-to{display:flex;gap:5px}
+.range-from-to select:first-child{width:72px;flex-shrink:0}
+
+/* ── Sync modal ─────────────────────────────────────── */
+.sync-section{border-top:1px solid #1e1e1e;padding-top:16px;margin-top:4px}
+.sync-section-title{font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3a3a3a;margin-bottom:10px}
+.fb-user-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:#181818;border:1px solid #242424;border-radius:4px;margin-bottom:12px}
+.fb-avatar{width:28px;height:28px;border-radius:50%;background:#c41e3a;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;flex-shrink:0}
+details summary{list-style:none;cursor:pointer}
+details summary::-webkit-details-marker{display:none}
+
 /* ── Responsive ──────────────────────────────────────── */
 @media(max-width:960px){.kg{grid-template-columns:1fr 1fr}.gcards{grid-template-columns:1fr 1fr}.g2{grid-template-columns:1fr}}
-
-/* Portrait phone — sidebar is a drawer, hamburger always visible */
 @media(max-width:640px){
   #sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);transition:transform .25s}
-  /* Sidebar also needs safe-area padding at top so its header clears the notch */
   .sb-brand{padding-top:max(env(safe-area-inset-top,0px),14px)}
   #sidebar.open{transform:translateX(0)}
   #mb-toggle{display:block}
@@ -234,9 +248,8 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
   .kg{grid-template-columns:1fr 1fr}.gcards{grid-template-columns:1fr}
   .fg{grid-template-columns:1fr}.fg .s2{grid-column:1}
   #gd-modal .modal{padding:16px}
+  .range-row{grid-template-columns:1fr}
 }
-
-/* Landscape phone — sidebar still a drawer (screen too narrow to share) */
 @media(max-width:900px) and (orientation:landscape){
   #sidebar{position:fixed;top:0;left:0;bottom:0;transform:translateX(-100%);transition:transform .25s;width:240px}
   #sidebar.open{transform:translateX(0)}
@@ -252,7 +265,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
 <nav id="sidebar">
   <div class="sb-brand">
     <div class="sb-logo"><div class="sb-icon">QT</div><div class="sb-name"><em>QTVIS</em> Apartments</div></div>
-    <div class="sb-sub">Business OS v2.2</div>
+    <div class="sb-sub">Business OS v2.3</div>
   </div>
   <div class="sb-sec">
     <div class="sb-lbl">Overview</div>
@@ -299,7 +312,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
     <div id="sb-dot"></div>
     <div id="sb-msg">Loading…</div>
     <div id="sb-time"></div>
-    <div id="sync-chip" onclick="openBackup()" title="Sync settings">☁ Not configured</div>
+    <div id="sync-chip" onclick="openBackup()" title="Sync settings">☁ Not synced</div>
   </div>
   <div id="install-bar">
     <span>📲 Install QTVIS OS as an app on this device</span>
@@ -338,7 +351,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Month Summary</span></div><div class="pb" id="inc-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">Income Entries</span><span class="pm" id="inc-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
+        <div class="ph2"><span class="pt">Income Entries</span><span class="pm" id="inc-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportRange()">⬇ Export CSV</button></div>
         <div class="tw"><table><thead><tr><th>Date</th><th>Source</th><th>Guest</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody id="inc-tb"></tbody></table></div>
       </div>
     </div>
@@ -354,14 +367,14 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Summary</span></div><div class="pb" id="ge-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">History</span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
+        <div class="ph2"><span class="pt">History</span><button class="btn btn-ghost btn-sm" onclick="openExportRange()">⬇ Export CSV</button></div>
         <div class="tw"><table><thead><tr><th>Period</th><th>Category</th><th>Amount</th></tr></thead><tbody id="ge-hist"></tbody></table></div>
       </div>
     </div>
 
     <!-- ADDITIONAL EXPENSES ────────────────────── -->
     <div id="view-addexp" class="view">
-      <div class="ph"><div><h2>Additional Expenses</h2><p>Maintenance, repairs, gifts — ad-hoc costs</p></div>
+      <div class="ph"><div><h2>Additional Expenses</h2><p>Variable costs — maintenance, repairs, gifts</p></div>
         <div class="pha"><button class="btn btn-ghost btn-sm" onclick="openCatModal('add','Add Expense Category')">+ Category</button></div></div>
       <div class="g2">
         <div class="panel"><div class="ph2"><span class="pt">+ Log Expense</span></div>
@@ -369,15 +382,15 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
             <div class="fg">
               <div class="fv"><label class="fl">Date</label><input type="date" id="ae-date"></div>
               <div class="fv"><label class="fl">Amount (R)</label><input type="number" id="ae-amt" placeholder="0.00" min="0" step="0.01"></div>
-              <div class="fv s2"><label class="fl">Category</label><select id="ae-cat"></select></div>
-              <div class="fv s2"><label class="fl">Description</label><input type="text" id="ae-desc" placeholder="What was this for?"></div>
+              <div class="fv"><label class="fl">Category</label><select id="ae-cat"></select></div>
+              <div class="fv s2"><label class="fl">Description</label><input type="text" id="ae-desc" placeholder="e.g. Plumber — bathroom tap"></div>
             </div>
-            <div class="fa"><button class="btn btn-red" onclick="addAddExp()">+ Log Expense</button><button class="btn btn-ghost" onclick="clr(['ae-date','ae-amt','ae-desc'])">Clear</button></div>
+            <div class="fa"><button class="btn btn-green" onclick="addAddExp()">+ Log Expense</button><button class="btn btn-ghost" onclick="clr(['ae-date','ae-amt','ae-desc'])">Clear</button></div>
           </div></div>
         <div class="panel"><div class="ph2"><span class="pt">📊 Summary</span></div><div class="pb" id="ae-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">Expense Log</span><span class="pm" id="ae-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
+        <div class="ph2"><span class="pt">Expense Log</span><span class="pm" id="ae-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportRange()">⬇ Export CSV</button></div>
         <div class="tw"><table><thead><tr><th>Date</th><th>Category</th><th>Description</th><th>Amount</th><th></th></tr></thead><tbody id="ae-tb"></tbody></table></div>
       </div>
     </div>
@@ -401,7 +414,7 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
         <div class="panel"><div class="ph2"><span class="pt">📊 Summary</span></div><div class="pb" id="cs-sum"></div></div>
       </div>
       <div class="panel">
-        <div class="ph2"><span class="pt">Purchase Log</span><span class="pm" id="cs-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportMonth()">⬇ Export Month CSV</button></div>
+        <div class="ph2"><span class="pt">Purchase Log</span><span class="pm" id="cs-total"></span><button class="btn btn-ghost btn-sm" onclick="openExportRange()">⬇ Export CSV</button></div>
         <div class="tw"><table><thead><tr><th>Date</th><th>Item</th><th>Qty</th><th>Unit Cost</th><th>Total</th><th></th></tr></thead><tbody id="cs-tb"></tbody></table></div>
       </div>
     </div>
@@ -491,12 +504,13 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
             <span style="display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;background:#c41e3a;border-radius:2px;display:inline-block"></span>Expenses</span>
           </div></div>
         <div class="pb"><div class="achart" id="ann-chart"></div></div></div>
-      <div class="panel"><div class="ph2"><span class="pt">Month-by-Month Breakdown</span><button class="btn btn-ghost btn-sm" onclick="exportAnnualCSV()">⬇ Export CSV</button></div>
+      <div class="panel"><div class="ph2"><span class="pt">Month-by-Month Breakdown</span><button class="btn btn-ghost btn-sm" onclick="exportAnnualCSV()">⬇ Year Summary CSV</button></div>
         <div class="tw"><table><thead><tr><th>Month</th><th>Income</th><th>General Exp</th><th>Additional Exp</th><th>Consumables</th><th>Total Expenses</th><th>Net</th></tr></thead><tbody id="ann-tb"></tbody></table></div></div>
       <div class="panel"><div class="ph2"><span class="pt">📁 Tax & Accounting Exports</span></div>
         <div class="pb">
           <div class="alert a-i" style="margin-bottom:14px">Export as CSV — open in Excel or Google Sheets, or send directly to your accountant for SARS submissions.</div>
           <div style="display:flex;gap:10px;flex-wrap:wrap">
+            <button class="btn btn-red btn-sm" onclick="openExportRange()">⬇ Export Date Range</button>
             <button class="btn btn-ghost btn-sm" onclick="exportAnnualCSV()">⬇ Annual Summary</button>
             <button class="btn btn-ghost btn-sm" onclick="exportAllIncomeCSV()">⬇ All Income</button>
             <button class="btn btn-ghost btn-sm" onclick="exportAllExpensesCSV()">⬇ All Expenses</button>
@@ -532,28 +546,60 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
   </div>
 </div>
 
-<!-- Month CSV Export -->
-<div class="overlay" id="export-month-modal">
-  <div class="modal">
-    <h3>Export Month to CSV</h3>
-    <div style="font-size:12px;color:#555;margin-bottom:14px">Select a period and what you want to export.</div>
-    <div class="mrow">
-      <select id="ex-year"></select>
-      <select id="ex-month">
-        <option value="01">January</option><option value="02">February</option><option value="03">March</option>
-        <option value="04">April</option><option value="05">May</option><option value="06">June</option>
-        <option value="07">July</option><option value="08">August</option><option value="09">September</option>
-        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
-      </select>
+<!-- ══ DATE RANGE CSV EXPORT ══════════════════════════════ -->
+<div class="overlay" id="export-range-modal">
+  <div class="modal" style="width:440px">
+    <h3>⬇ Export to CSV</h3>
+    <!-- Quick presets -->
+    <div style="margin-bottom:14px">
+      <div class="fl" style="margin-bottom:7px">Quick Range</div>
+      <div class="preset-btns">
+        <button class="preset-btn" onclick="setRangePreset('month')">This Month</button>
+        <button class="preset-btn" onclick="setRangePreset('3m')">Last 3 Months</button>
+        <button class="preset-btn" onclick="setRangePreset('6m')">Last 6 Months</button>
+        <button class="preset-btn" onclick="setRangePreset('year')">This Year</button>
+        <button class="preset-btn" onclick="setRangePreset('lastyear')">Last Year</button>
+      </div>
     </div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:4px">
-      <button class="btn btn-ghost" onclick="runExportMonth('income')">⬇ Income Entries</button>
-      <button class="btn btn-ghost" onclick="runExportMonth('genexp')">⬇ General Expenses</button>
-      <button class="btn btn-ghost" onclick="runExportMonth('addexp')">⬇ Additional Expenses</button>
-      <button class="btn btn-ghost" onclick="runExportMonth('consumables')">⬇ Consumables</button>
-      <button class="btn btn-green" onclick="runExportMonth('all')">⬇ Full Month Summary</button>
+    <!-- From / To -->
+    <div class="range-row">
+      <div>
+        <div class="fl" style="margin-bottom:5px">From</div>
+        <div class="range-from-to">
+          <select id="er-from-year"></select>
+          <select id="er-from-month">
+            <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
+            <option value="04">Apr</option><option value="05">May</option><option value="06">Jun</option>
+            <option value="07">Jul</option><option value="08">Aug</option><option value="09">Sep</option>
+            <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+          </select>
+        </div>
+      </div>
+      <div>
+        <div class="fl" style="margin-bottom:5px">To</div>
+        <div class="range-from-to">
+          <select id="er-to-year"></select>
+          <select id="er-to-month">
+            <option value="01">Jan</option><option value="02">Feb</option><option value="03">Mar</option>
+            <option value="04">Apr</option><option value="05">May</option><option value="06">Jun</option>
+            <option value="07">Jul</option><option value="08">Aug</option><option value="09">Sep</option>
+            <option value="10">Oct</option><option value="11">Nov</option><option value="12">Dec</option>
+          </select>
+        </div>
+      </div>
     </div>
-    <div class="mbtns" style="margin-top:12px"><button class="btn btn-ghost" onclick="closeOv('export-month-modal')">Close</button></div>
+    <!-- Include checkboxes -->
+    <div style="margin-bottom:16px">
+      <div class="fl" style="margin-bottom:8px">Include in export</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px">
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#888;cursor:pointer"><input type="checkbox" id="er-inc" checked> Income</label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#888;cursor:pointer"><input type="checkbox" id="er-gen" checked> General Expenses</label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#888;cursor:pointer"><input type="checkbox" id="er-add" checked> Additional Expenses</label>
+        <label style="display:flex;align-items:center;gap:7px;font-size:12px;color:#888;cursor:pointer"><input type="checkbox" id="er-cons" checked> Consumables</label>
+      </div>
+    </div>
+    <button class="btn btn-green" style="width:100%;justify-content:center" onclick="runExportRange()">⬇ Download CSV</button>
+    <div class="mbtns" style="margin-top:8px"><button class="btn btn-ghost" onclick="closeOv('export-range-modal')">Close</button></div>
   </div>
 </div>
 
@@ -572,37 +618,93 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
   </div>
 </div>
 
-<!-- Backup & Sync -->
+<!-- ══ BACKUP & SYNC ══════════════════════════════════════ -->
 <div class="overlay" id="backup-modal">
-  <div class="modal" style="width:420px">
+  <div class="modal" style="width:440px">
     <h3>Backup & Sync</h3>
-    <!-- Backup section -->
+
+    <!-- Local backup -->
     <div style="margin-bottom:20px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3a3a3a;margin-bottom:10px">Local Backup</div>
+      <div class="sync-section-title">Local Backup</div>
       <div class="alert a-i" style="margin-bottom:10px;font-size:11px">Your data lives on this device. Download a backup regularly to keep it safe.</div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="downloadBackup()">⬇ Download JSON Backup</button>
         <label class="btn btn-ghost btn-sm" style="cursor:pointer">⬆ Restore from Backup<input type="file" id="restore-file" accept=".json" style="display:none" onchange="restoreFromFile(this)"></label>
       </div>
     </div>
-    <!-- Sync section -->
-    <div style="border-top:1px solid #1e1e1e;padding-top:16px">
-      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:#3a3a3a;margin-bottom:8px">☁ Multi-Device Sync (JSONBin.io)</div>
-      <div class="alert a-i" style="margin-bottom:12px;font-size:11px;line-height:1.6">
-        <strong style="display:block;margin-bottom:4px">Free setup — 3 steps:</strong>
-        1. Sign up free at <strong>jsonbin.io</strong><br>
-        2. Go to <strong>API Keys</strong> → create key → paste below<br>
-        3. Click <strong>Create Cloud Storage</strong> (first device) OR paste your Bin ID (other devices)
+
+    <!-- Google / Firebase Sync -->
+    <div class="sync-section">
+      <div class="sync-section-title">☁ Cloud Sync — Google Account</div>
+
+      <!-- Not configured -->
+      <div id="fb-not-configured">
+        <div class="alert a-w" style="font-size:11px;margin-bottom:10px">
+          Google Sync is not yet set up. Ask KRP Solutions to configure Firebase, or follow the guide below.
+        </div>
+        <details style="margin-bottom:8px">
+          <summary style="font-size:11px;color:#555;padding:6px 0;display:flex;align-items:center;gap:5px">
+            <span id="fb-guide-arrow">▸</span> One-time setup guide (5 min)
+          </summary>
+          <div style="font-size:10px;color:#404040;line-height:2;padding:8px 0 0 0">
+            1. Go to <strong style="color:#888">console.firebase.google.com</strong><br>
+            2. Create project → Add web app → Copy config object<br>
+            3. Enable <strong style="color:#888">Google Sign-in</strong> under Authentication<br>
+            4. Create <strong style="color:#888">Firestore Database</strong> (Start in test mode)<br>
+            5. Set Firestore rules:<br>
+            <code style="color:#c41e3a;font-size:9px;display:block;padding:4px;background:#111;border-radius:2px;margin:4px 0">match /qtvis_data/{uid} {<br>&nbsp;&nbsp;allow read, write: if request.auth.uid == uid;<br>}</code>
+            6. Paste your config into <code style="color:#c41e3a">FIREBASE_CONFIG</code> in index.html
+          </div>
+        </details>
       </div>
-      <div class="fv" style="margin-bottom:10px"><label class="fl">JSONBin API Key</label><input type="text" id="sync-key" placeholder="$2b$10$..." autocomplete="off"></div>
-      <div class="fv" style="margin-bottom:12px"><label class="fl">Bin ID (auto-filled after first sync)</label><input type="text" id="sync-bin" placeholder="Leave blank to auto-create"></div>
-      <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="btn btn-green btn-sm" onclick="syncConnect()">Create / Connect Cloud</button>
-        <button class="btn btn-ghost btn-sm" onclick="syncPull()">⬇ Pull from Cloud</button>
-        <button class="btn btn-ghost btn-sm" onclick="syncPush()">⬆ Push to Cloud</button>
+
+      <!-- Configured — signed out -->
+      <div id="fb-signed-out" style="display:none">
+        <div class="alert a-i" style="font-size:11px;margin-bottom:14px">
+          Sign in with Google to sync your data automatically across all your devices.
+        </div>
+        <button class="btn btn-google" onclick="firebaseSignIn()">
+          <svg width="16" height="16" viewBox="0 0 18 18" style="flex-shrink:0"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844c-.209 1.125-.843 2.078-1.796 2.717v2.258h2.908c1.702-1.567 2.684-3.874 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.909-2.259c-.806.54-1.837.86-3.047.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332C2.438 15.983 5.482 18 9 18z"/><path fill="#FBBC05" d="M3.964 10.71c-.18-.54-.282-1.117-.282-1.71 0-.593.102-1.17.282-1.71V4.958H.957C.347 6.173 0 7.548 0 9s.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0 5.482 0 2.438 2.017.957 4.958L3.964 7.29C4.672 5.163 6.656 3.58 9 3.58z"/></svg>
+          Sign in with Google
+        </button>
       </div>
-      <div id="sync-status-msg" style="font-size:11px;color:#505050;margin-top:10px;min-height:16px"></div>
+
+      <!-- Configured — signed in -->
+      <div id="fb-signed-in" style="display:none">
+        <div class="fb-user-row">
+          <div class="fb-avatar" id="fb-avatar">?</div>
+          <div style="flex:1;min-width:0">
+            <div style="font-size:12px;font-weight:700;color:#c8c8c8;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="fb-display-name">—</div>
+            <div style="font-size:10px;color:#404040;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" id="fb-email-display">—</div>
+          </div>
+          <button class="btn btn-ghost btn-xs" onclick="firebaseSignOut()">Sign out</button>
+        </div>
+        <div style="font-size:11px;color:#2d9b6f;margin-bottom:12px" id="fb-sync-status">☁ Auto-sync active — saves after every change.</div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-green btn-sm" onclick="firebasePushManual()">⬆ Push to Cloud</button>
+          <button class="btn btn-ghost btn-sm" onclick="firebasePullManual()">⬇ Pull from Cloud</button>
+        </div>
+      </div>
     </div>
+
+    <!-- Legacy JSONBin (collapsed) -->
+    <div style="border-top:1px solid #1a1a1a;padding-top:12px;margin-top:16px">
+      <details>
+        <summary style="font-size:10px;color:#2a2a2a;letter-spacing:.08em;text-transform:uppercase;padding:4px 0;cursor:pointer">▸ Legacy Manual Sync (JSONBin)</summary>
+        <div style="padding-top:12px">
+          <div class="alert a-w" style="font-size:10px;margin-bottom:10px">Use Google Sync above for easier setup. JSONBin requires manual API key sharing between devices.</div>
+          <div class="fv" style="margin-bottom:10px"><label class="fl">JSONBin API Key</label><input type="text" id="sync-key" placeholder="$2b$10$..." autocomplete="off"></div>
+          <div class="fv" style="margin-bottom:12px"><label class="fl">Bin ID (auto-filled after first sync)</label><input type="text" id="sync-bin" placeholder="Leave blank to auto-create"></div>
+          <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <button class="btn btn-green btn-sm" onclick="syncConnect()">Create / Connect</button>
+            <button class="btn btn-ghost btn-sm" onclick="syncPull()">⬇ Pull</button>
+            <button class="btn btn-ghost btn-sm" onclick="syncPush()">⬆ Push</button>
+          </div>
+          <div id="sync-status-msg" style="font-size:11px;color:#505050;margin-top:10px;min-height:16px"></div>
+        </div>
+      </details>
+    </div>
+
     <div class="mbtns" style="margin-top:16px"><button class="btn btn-ghost" onclick="closeOv('backup-modal')">Close</button></div>
   </div>
 </div>
@@ -624,6 +726,33 @@ textarea{resize:vertical;min-height:66px;line-height:1.5}
 
 <script>
 /* ══════════════════════════════════════════════════════
+   FIREBASE CONFIG
+   ─────────────────────────────────────────────────────
+   Replace null with your Firebase config object.
+   Get it from: console.firebase.google.com
+   → Your project → Project Settings → Your apps → Config
+
+   Example:
+   var FIREBASE_CONFIG = {
+     apiKey: "AIzaSy...",
+     authDomain: "your-project.firebaseapp.com",
+     projectId: "your-project-id",
+     storageBucket: "your-project.appspot.com",
+     messagingSenderId: "123456789",
+     appId: "1:123456789:web:abcdef123456"
+   };
+══════════════════════════════════════════════════════ */
+var FIREBASE_CONFIG = {
+  apiKey:            "AIzaSyCJtaxXU_4vXtLBo8I5TnOzjVU2V7UnEU4",
+  authDomain:        "qtvis-test.firebaseapp.com",
+  projectId:         "qtvis-test",
+  storageBucket:     "qtvis-test.firebasestorage.app",
+  messagingSenderId: "451418294044",
+  appId:             "1:451418294044:web:54ae2e376963e49b44dcd9",
+  measurementId:     "G-VKLPK3DF7S"
+};
+
+/* ══════════════════════════════════════════════════════
    DATA MODEL
 ══════════════════════════════════════════════════════ */
 var DB = {
@@ -644,7 +773,7 @@ var DB = {
 var CUR = { y:'', m:'' };
 
 /* ══════════════════════════════════════════════════════
-   INDEXEDDB — unlimited local storage
+   INDEXEDDB
 ══════════════════════════════════════════════════════ */
 var _idb=null, IDB='qtvis_os_v5', STORE='d';
 
@@ -682,11 +811,12 @@ function saveDB(immediate){
     idbPut(JSON.parse(JSON.stringify(DB)),function(ok){
       if(ok){
         setStat('ok','All changes saved',new Date().toISOString());
-        // Auto-push to sync if configured
-        if(DB.sync.apiKey&&DB.sync.binId){
-          clearTimeout(_syncTimer);
-          _syncTimer=setTimeout(function(){syncPushSilent();},4000);
-        }
+        // Auto-push — prefer Firebase, fall back to JSONBin
+        clearTimeout(_syncTimer);
+        _syncTimer=setTimeout(function(){
+          if(_fbUser&&_fbDb) firebasePushSilent();
+          else if(DB.sync.apiKey&&DB.sync.binId) syncPushSilent();
+        },4000);
       } else {
         setStat('err','Save failed',null);
       }
@@ -724,14 +854,25 @@ function setStat(state,msg,ts){
   if(timeEl)timeEl.textContent=ts?new Date(ts).toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit',second:'2-digit'}):'';
   updateSyncChip();
 }
+
 function updateSyncChip(){
   var chip=document.getElementById('sync-chip');if(!chip)return;
-  if(!DB.sync.apiKey||!DB.sync.binId){chip.textContent='☁ Not synced';chip.className='';return;}
-  if(DB.sync.lastSync){
-    var d=new Date(DB.sync.lastSync);
-    chip.textContent='☁ '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
-    chip.className='';
-  } else { chip.textContent='☁ Configured';chip.className=''; }
+  if(_fbUser){
+    var name=_fbUser.displayName||_fbUser.email||'Google';
+    var short=name.split(' ')[0];
+    chip.textContent='☁ '+short;
+    chip.className='signed-in';
+    return;
+  }
+  if(DB.sync.apiKey&&DB.sync.binId){
+    if(DB.sync.lastSync){
+      var d=new Date(DB.sync.lastSync);
+      chip.textContent='☁ '+d.toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+      chip.className='';
+    } else { chip.textContent='☁ JSONBin';chip.className=''; }
+    return;
+  }
+  chip.textContent='☁ Not synced';chip.className='';
 }
 
 /* ══════════════════════════════════════════════════════
@@ -755,92 +896,234 @@ function renderAudit(){
 }
 
 /* ══════════════════════════════════════════════════════
-   SYNC — JSONBin.io
+   FIREBASE SYNC
+══════════════════════════════════════════════════════ */
+var _fbApp=null,_fbAuth=null,_fbDb=null,_fbUser=null;
+
+function initFirebase(){
+  if(!FIREBASE_CONFIG){
+    // Show "not configured" state
+    var nc=document.getElementById('fb-not-configured');
+    var so=document.getElementById('fb-signed-out');
+    var si=document.getElementById('fb-signed-in');
+    if(nc)nc.style.display='block';
+    if(so)so.style.display='none';
+    if(si)si.style.display='none';
+    return;
+  }
+  // Firebase SDKs must be loaded — check they exist
+  if(typeof firebase==='undefined'){
+    console.warn('Firebase SDKs not loaded yet.');
+    return;
+  }
+  try{
+    if(!firebase.apps.length){
+      _fbApp=firebase.initializeApp(FIREBASE_CONFIG);
+    } else {
+      _fbApp=firebase.apps[0];
+    }
+    _fbAuth=firebase.auth();
+    _fbDb=firebase.firestore();
+
+    // Listen for auth state changes
+    _fbAuth.onAuthStateChanged(function(user){
+      _fbUser=user;
+      updateSyncChip();
+      updateFbModalUI();
+      if(user){
+        // Auto-pull on sign-in if local data looks empty
+        var localCount=(DB.payments.length||0)+(DB.guests.length||0);
+        if(localCount===0){
+          firebasePullSilent();
+        } else {
+          // Merge: pull and take whichever has more data
+          firebasePullSilent();
+        }
+      }
+    });
+  } catch(e){
+    console.warn('Firebase init error:',e);
+  }
+}
+
+function updateFbModalUI(){
+  var nc=document.getElementById('fb-not-configured');
+  var so=document.getElementById('fb-signed-out');
+  var si=document.getElementById('fb-signed-in');
+  if(!nc||!so||!si)return;
+
+  if(!FIREBASE_CONFIG){
+    nc.style.display='block';so.style.display='none';si.style.display='none';
+    return;
+  }
+  nc.style.display='none';
+  if(_fbUser){
+    so.style.display='none';si.style.display='flex';si.style.flexDirection='column';
+    var av=document.getElementById('fb-avatar');
+    var nm=document.getElementById('fb-display-name');
+    var em=document.getElementById('fb-email-display');
+    if(av)av.textContent=(_fbUser.displayName||_fbUser.email||'?')[0].toUpperCase();
+    if(nm)nm.textContent=_fbUser.displayName||'—';
+    if(em)em.textContent=_fbUser.email||'—';
+  } else {
+    so.style.display='block';si.style.display='none';
+  }
+}
+
+function firebaseSignIn(){
+  if(!_fbAuth){toast('Firebase not configured.',true);return;}
+  var provider=new firebase.auth.GoogleAuthProvider();
+  _fbAuth.signInWithPopup(provider).catch(function(e){
+    toast('Sign-in failed: '+e.message,true);
+  });
+}
+
+function firebaseSignOut(){
+  if(!_fbAuth)return;
+  _fbAuth.signOut().then(function(){toast('Signed out.');updateSyncChip();});
+}
+
+function firebasePushSilent(){
+  if(!_fbDb||!_fbUser)return;
+  var payload=JSON.parse(JSON.stringify(DB));
+  payload._fbSyncTime=new Date().toISOString();
+  _fbDb.collection('qtvis_data').doc(_fbUser.uid).set(payload)
+  .then(function(){
+    DB.sync.lastSync=new Date().toISOString();
+    updateSyncChip();
+  }).catch(function(e){console.warn('Firebase push error:',e);});
+}
+
+function firebasePullSilent(){
+  if(!_fbDb||!_fbUser)return;
+  _fbDb.collection('qtvis_data').doc(_fbUser.uid).get()
+  .then(function(doc){
+    if(doc.exists){
+      var remote=doc.data();
+      if(remote&&remote.v){
+        var localCount=(DB.payments.length||0)+(DB.guests.length||0);
+        var remoteCount=(remote.payments||[]).length+(remote.guests||[]).length;
+        if(remoteCount>localCount){
+          DB=remote;ensureDefaults();saveDB(true);nav(curView());
+          toast('☁ Data synced from cloud.');
+        }
+        DB.sync.lastSync=new Date().toISOString();updateSyncChip();
+      }
+    } else {
+      // No cloud data yet — push current local data
+      firebasePushSilent();
+    }
+  }).catch(function(e){console.warn('Firebase pull error:',e);});
+}
+
+function firebasePushManual(){
+  if(!_fbDb||!_fbUser){toast('Not signed in.',true);return;}
+  var sc=document.getElementById('sync-chip');if(sc){sc.className='syncing';sc.textContent='☁ Pushing…';}
+  var el=document.getElementById('fb-sync-status');if(el)el.textContent='Pushing to cloud…';
+  var payload=JSON.parse(JSON.stringify(DB));
+  payload._fbSyncTime=new Date().toISOString();
+  _fbDb.collection('qtvis_data').doc(_fbUser.uid).set(payload)
+  .then(function(){
+    DB.sync.lastSync=new Date().toISOString();
+    updateSyncChip();updateFbModalUI();
+    if(el)el.textContent='☁ Pushed at '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+    audit('☁','Pushed to Cloud','Manual push — '+_fbUser.email);
+    toast('✓ Pushed to cloud!');
+  }).catch(function(e){
+    updateSyncChip();
+    if(el)el.textContent='Push failed: '+e.message;
+    toast('Push failed.',true);
+  });
+}
+
+function firebasePullManual(){
+  if(!_fbDb||!_fbUser){toast('Not signed in.',true);return;}
+  var sc=document.getElementById('sync-chip');if(sc){sc.className='syncing';sc.textContent='☁ Pulling…';}
+  var el=document.getElementById('fb-sync-status');if(el)el.textContent='Pulling from cloud…';
+  _fbDb.collection('qtvis_data').doc(_fbUser.uid).get()
+  .then(function(doc){
+    if(doc.exists&&doc.data()&&doc.data().v){
+      DB=doc.data();ensureDefaults();
+      DB.sync.lastSync=new Date().toISOString();
+      saveDB(true);nav(curView());
+      updateSyncChip();updateFbModalUI();
+      if(el)el.textContent='☁ Pulled at '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'});
+      audit('☁','Pulled from Cloud','Manual pull — '+_fbUser.email);
+      toast('✓ Synced from cloud!');
+    } else {
+      if(el)el.textContent='No cloud data found. Push first.';
+      updateSyncChip();
+      toast('No cloud data found. Push first.',true);
+    }
+  }).catch(function(e){
+    updateSyncChip();
+    if(el)el.textContent='Pull failed: '+e.message;
+    toast('Pull failed.',true);
+  });
+}
+
+/* ══════════════════════════════════════════════════════
+   LEGACY SYNC — JSONBin.io
 ══════════════════════════════════════════════════════ */
 var JBIN='https://api.jsonbin.io/v3/b';
 
-function syncHeaders(){
-  return{'Content-Type':'application/json','X-Master-Key':DB.sync.apiKey};
-}
-function syncMsg(msg,ok){
-  var el=document.getElementById('sync-status-msg');
-  if(el){el.textContent=msg;el.style.color=ok===true?'#2d9b6f':ok===false?'#c41e3a':'#888';}
-}
+function syncHeaders(){return{'Content-Type':'application/json','X-Master-Key':DB.sync.apiKey};}
+function syncMsg(msg,ok){var el=document.getElementById('sync-status-msg');if(el){el.textContent=msg;el.style.color=ok===true?'#2d9b6f':ok===false?'#c41e3a':'#888';}}
 
 function syncConnect(){
   var key=(document.getElementById('sync-key').value||'').trim();
   var binId=(document.getElementById('sync-bin').value||'').trim();
   if(!key){syncMsg('Please enter your API key.',false);return;}
   DB.sync.apiKey=key;
-  if(binId){
-    DB.sync.binId=binId;
-    syncMsg('Connecting…',null);
-    syncPull();
-  } else {
+  if(binId){DB.sync.binId=binId;syncMsg('Connecting…',null);syncPull();}
+  else{
     syncMsg('Creating cloud storage…',null);
     fetch(JBIN,{method:'POST',headers:Object.assign({'X-Bin-Name':'QTVIS Business OS','X-Bin-Private':'true'},syncHeaders()),body:JSON.stringify(DB)})
-    .then(function(r){return r.json();})
-    .then(function(d){
+    .then(function(r){return r.json();}).then(function(d){
       if(d.metadata&&d.metadata.id){
         DB.sync.binId=d.metadata.id;DB.sync.lastSync=new Date().toISOString();
-        saveDB(true);
-        document.getElementById('sync-bin').value=d.metadata.id;
-        syncMsg('✓ Cloud storage created! Bin ID: '+d.metadata.id+'\nSave this ID to use on other devices.',true);
-        updateSyncChip();
-        audit('☁','Sync Created','Bin ID: '+d.metadata.id);
-        toast('Cloud storage created!');
-      } else { syncMsg('Error: '+(d.message||'Could not create bin.'),false); }
-    }).catch(function(){syncMsg('Network error. Check your API key and internet.',false);});
+        saveDB(true);document.getElementById('sync-bin').value=d.metadata.id;
+        syncMsg('✓ Created! Bin ID: '+d.metadata.id,true);updateSyncChip();audit('☁','JSONBin Created','Bin: '+d.metadata.id);toast('Cloud storage created!');
+      } else {syncMsg('Error: '+(d.message||'Could not create bin.'),false);}
+    }).catch(function(){syncMsg('Network error.',false);});
   }
 }
 
 function syncPull(){
-  if(!DB.sync.apiKey||!DB.sync.binId){syncMsg('Not configured. Enter API key and Bin ID first.',false);return;}
-  var sc=document.getElementById('sync-chip');if(sc){sc.className='syncing';sc.textContent='☁ Syncing…';}
-  syncMsg('Pulling from cloud…',null);
+  if(!DB.sync.apiKey||!DB.sync.binId){syncMsg('Not configured.',false);return;}
   fetch(JBIN+'/'+DB.sync.binId+'/latest',{headers:syncHeaders()})
-  .then(function(r){return r.json();})
-  .then(function(d){
+  .then(function(r){return r.json();}).then(function(d){
     if(d.record&&d.record.v){
-      DB=d.record;ensureDefaults();
-      DB.sync.lastSync=new Date().toISOString();
-      saveDB(true);
-      nav(curView());
-      syncMsg('✓ Synced from cloud — '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}),true);
-      updateSyncChip();audit('☁','Pulled from Cloud','Data synced');toast('Synced from cloud!');
-    } else { syncMsg('Error: '+(d.message||'No data found. Push first.'),false);updateSyncChip(); }
-  }).catch(function(){syncMsg('Network error.',false);updateSyncChip();});
+      DB=d.record;ensureDefaults();DB.sync.lastSync=new Date().toISOString();
+      saveDB(true);nav(curView());syncMsg('✓ Synced — '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}),true);
+      updateSyncChip();audit('☁','Pulled from JSONBin','');toast('Synced!');
+    } else {syncMsg('Error: '+(d.message||'No data.'),false);}
+  }).catch(function(){syncMsg('Network error.',false);});
 }
 
 function syncPush(){
   if(!DB.sync.apiKey||!DB.sync.binId){syncMsg('Not configured.',false);return;}
-  var sc=document.getElementById('sync-chip');if(sc){sc.className='syncing';sc.textContent='☁ Syncing…';}
-  syncMsg('Pushing to cloud…',null);
   fetch(JBIN+'/'+DB.sync.binId,{method:'PUT',headers:syncHeaders(),body:JSON.stringify(DB)})
-  .then(function(r){return r.json();})
-  .then(function(d){
+  .then(function(r){return r.json();}).then(function(d){
     if(d.metadata){
-      DB.sync.lastSync=new Date().toISOString();
-      saveDB(true);
-      syncMsg('✓ Pushed to cloud — '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}),true);
-      updateSyncChip();audit('☁','Pushed to Cloud','Data synced');toast('Pushed to cloud!');
-    } else { syncMsg('Error: '+(d.message||'Push failed.'),false);updateSyncChip(); }
-  }).catch(function(){syncMsg('Network error.',false);updateSyncChip();});
+      DB.sync.lastSync=new Date().toISOString();saveDB(true);
+      syncMsg('✓ Pushed — '+new Date().toLocaleTimeString('en-ZA',{hour:'2-digit',minute:'2-digit'}),true);
+      updateSyncChip();audit('☁','Pushed to JSONBin','');toast('Pushed!');
+    } else {syncMsg('Error: '+(d.message||'Push failed.'),false);}
+  }).catch(function(){syncMsg('Network error.',false);});
 }
 
 function syncPushSilent(){
   if(!DB.sync.apiKey||!DB.sync.binId)return;
   fetch(JBIN+'/'+DB.sync.binId,{method:'PUT',headers:syncHeaders(),body:JSON.stringify(DB)})
-  .then(function(r){return r.json();})
-  .then(function(d){
-    if(d.metadata){DB.sync.lastSync=new Date().toISOString();updateSyncChip();}
-  }).catch(function(){});
+  .then(function(r){return r.json();}).then(function(d){if(d.metadata){DB.sync.lastSync=new Date().toISOString();updateSyncChip();}}).catch(function(){});
 }
 
 function openBackup(){
-  var key=document.getElementById('sync-key');var bin=document.getElementById('sync-bin');
+  var key=document.getElementById('sync-key'),bin=document.getElementById('sync-bin');
   if(key)key.value=DB.sync.apiKey||'';if(bin)bin.value=DB.sync.binId||'';
   syncMsg('',null);
+  updateFbModalUI();
   document.getElementById('backup-modal').classList.add('open');
 }
 
@@ -913,7 +1196,7 @@ function toast(msg,err){
 }
 
 /* ══════════════════════════════════════════════════════
-   CONFIRM DIALOG — fixed: capture callback before clearing
+   CONFIRM DIALOG
 ══════════════════════════════════════════════════════ */
 var _cfCb;
 function confirm2(title,msg,cb){
@@ -922,11 +1205,7 @@ function confirm2(title,msg,cb){
   _cfCb=cb;document.getElementById('cf-ov').classList.add('open');
 }
 function closeCf(){document.getElementById('cf-ov').classList.remove('open');_cfCb=null;}
-document.getElementById('cf-yes').onclick=function(){
-  var cb=_cfCb; // capture BEFORE closeCf nulls it
-  closeCf();
-  if(cb)cb();
-};
+document.getElementById('cf-yes').onclick=function(){var cb=_cfCb;closeCf();if(cb)cb();};
 
 function closeOv(id){document.getElementById(id).classList.remove('open');}
 
@@ -941,8 +1220,7 @@ function nav(id){
   var v=document.getElementById('view-'+id);if(v)v.classList.add('active');
   var b=document.querySelector('.sbi[data-v="'+id+'"]');if(b)b.classList.add('active');
   document.getElementById('tb-title').textContent=TITLES[id]||id;
-  closeSidebar();
-  renderView(id);
+  closeSidebar();renderView(id);
 }
 
 function renderView(id){
@@ -1215,7 +1493,7 @@ function renderInventory(){
 }
 
 /* ══════════════════════════════════════════════════════
-   GUESTS — with detail/edit modal
+   GUESTS
 ══════════════════════════════════════════════════════ */
 var _gdId=null,_gdEdit=false;
 
@@ -1237,11 +1515,7 @@ function delGuest(id){
   });
 }
 
-function openGuestDetail(id){
-  _gdId=id;_gdEdit=false;
-  renderGuestDetail();
-  document.getElementById('gd-modal').classList.add('open');
-}
+function openGuestDetail(id){_gdId=id;_gdEdit=false;renderGuestDetail();document.getElementById('gd-modal').classList.add('open');}
 
 function renderGuestDetail(){
   var g=DB.guests.find(function(x){return x.id===_gdId;});
@@ -1251,53 +1525,35 @@ function renderGuestDetail(){
   var totalNights=pays.reduce(function(s,p){return s+(+p.nights||0);},0);
   var ini=(g.name[0]||'')+(g.surname[0]||'');
   var html='';
-
   if(_gdEdit){
-    html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px">'+
-      '<h3 style="font-size:15px;font-weight:700;color:#e0e0e0">Edit Guest Profile</h3>'+
-      '<button class="btn btn-ghost btn-sm" onclick="closeOv(\'gd-modal\')">✕</button></div>'+
-      '<div class="fg">'+
-      '<div class="fv"><label class="fl">First Name</label><input type="text" id="gd-name" value="'+esc(g.name)+'"></div>'+
+    html='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px"><h3 style="font-size:15px;font-weight:700;color:#e0e0e0">Edit Guest Profile</h3><button class="btn btn-ghost btn-sm" onclick="closeOv(\'gd-modal\')">✕</button></div>'+
+      '<div class="fg"><div class="fv"><label class="fl">First Name</label><input type="text" id="gd-name" value="'+esc(g.name)+'"></div>'+
       '<div class="fv"><label class="fl">Surname</label><input type="text" id="gd-sur" value="'+esc(g.surname)+'"></div>'+
       '<div class="fv"><label class="fl">Cell</label><input type="tel" id="gd-cell" value="'+esc(g.cell||'')+'"></div>'+
       '<div class="fv"><label class="fl">Email</label><input type="email" id="gd-email" value="'+esc(g.email||'')+'"></div>'+
       '<div class="fv s2"><label class="fl">Location</label><input type="text" id="gd-loc" value="'+esc(g.loc||'')+'"></div>'+
-      '<div class="fv s2"><label class="fl">Notes</label><textarea id="gd-notes">'+esc(g.notes||'')+'</textarea></div>'+
-      '</div>'+
-      '<div class="fa">'+
-      '<button class="btn btn-green" onclick="saveGuestEdit()">Save Changes</button>'+
-      '<button class="btn btn-ghost" onclick="_gdEdit=false;renderGuestDetail()">Cancel</button>'+
-      '</div>';
+      '<div class="fv s2"><label class="fl">Notes</label><textarea id="gd-notes">'+esc(g.notes||'')+'</textarea></div></div>'+
+      '<div class="fa"><button class="btn btn-green" onclick="saveGuestEdit()">Save Changes</button><button class="btn btn-ghost" onclick="_gdEdit=false;renderGuestDetail()">Cancel</button></div>';
   } else {
     html='<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;gap:12px">'+
-      '<div style="display:flex;align-items:center;gap:12px">'+
-      '<div class="gc-av" style="width:48px;height:48px;font-size:16px;flex-shrink:0">'+esc(ini.toUpperCase())+'</div>'+
+      '<div style="display:flex;align-items:center;gap:12px"><div class="gc-av" style="width:48px;height:48px;font-size:16px;flex-shrink:0">'+esc(ini.toUpperCase())+'</div>'+
       '<div><div style="font-size:16px;font-weight:700;color:#e0e0e0;margin-bottom:2px">'+esc(g.name)+' '+esc(g.surname)+'</div>'+
       '<div style="font-size:12px;color:#484848">📞 '+esc(g.cell||'—')+(g.email?'&nbsp;·&nbsp;'+esc(g.email):'')+'</div>'+
       '<div style="font-size:12px;color:#404040">📍 '+esc(g.loc||'—')+'</div></div></div>'+
-      '<div style="display:flex;gap:6px;flex-shrink:0">'+
-      '<button class="btn btn-ghost btn-sm" onclick="_gdEdit=true;renderGuestDetail()">✏ Edit</button>'+
+      '<div style="display:flex;gap:6px;flex-shrink:0"><button class="btn btn-ghost btn-sm" onclick="_gdEdit=true;renderGuestDetail()">✏ Edit</button>'+
       '<button class="btn btn-ghost btn-sm" onclick="closeOv(\'gd-modal\')">✕</button></div></div>'+
-      // Stats
       '<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:16px">'+
       '<div class="kpi k-inc" style="padding:11px"><div class="kl">Total Paid</div><div class="kv" style="font-size:16px">'+R(totalPaid)+'</div></div>'+
       '<div class="kpi k-bk" style="padding:11px"><div class="kl">Bookings</div><div class="kv" style="font-size:16px">'+pays.length+'</div></div>'+
-      '<div class="kpi k-exp" style="padding:11px"><div class="kl">Nights</div><div class="kv" style="font-size:16px">'+totalNights+'</div></div>'+
-      '</div>';
+      '<div class="kpi k-exp" style="padding:11px"><div class="kl">Nights</div><div class="kv" style="font-size:16px">'+totalNights+'</div></div></div>';
     if(g.notes)html+='<div class="alert a-i" style="margin-bottom:12px"><strong>Notes:</strong> '+esc(g.notes)+'</div>';
     html+='<div class="panel"><div class="ph2"><span class="pt">Booking History</span></div>';
     if(pays.length){
       html+='<div class="tw"><table><thead><tr><th>Date</th><th>Check-in</th><th>Check-out</th><th>Nights</th><th>Method</th><th>Amount</th></tr></thead><tbody>'+
-        pays.map(function(p){
-          return '<tr><td>'+p.date+'</td><td>'+esc(p.checkIn||'—')+'</td><td>'+esc(p.checkOut||'—')+'</td><td>'+(p.nights||'—')+'</td><td><span class="chip ch-x">'+esc(p.method)+'</span></td><td class="pos">'+R(p.amount)+'</td></tr>';
-        }).join('')+'</tbody></table></div>';
-    } else {
-      html+='<div class="pb"><div style="text-align:center;color:#222;padding:14px;font-style:italic">No bookings recorded yet.</div></div>';
-    }
-    html+='</div>';
-    html+='<div style="margin-top:14px;text-align:right"><button class="btn btn-danger btn-sm" onclick="closeOv(\'gd-modal\');delGuest(\''+g.id+'\')">Remove Profile</button></div>';
+        pays.map(function(p){return '<tr><td>'+p.date+'</td><td>'+esc(p.checkIn||'—')+'</td><td>'+esc(p.checkOut||'—')+'</td><td>'+(p.nights||'—')+'</td><td><span class="chip ch-x">'+esc(p.method)+'</span></td><td class="pos">'+R(p.amount)+'</td></tr>';}).join('')+'</tbody></table></div>';
+    } else {html+='<div class="pb"><div style="text-align:center;color:#222;padding:14px;font-style:italic">No bookings recorded yet.</div></div>';}
+    html+='</div><div style="margin-top:14px;text-align:right"><button class="btn btn-danger btn-sm" onclick="closeOv(\'gd-modal\');delGuest(\''+g.id+'\')">Remove Profile</button></div>';
   }
-
   document.getElementById('gd-content').innerHTML=html;
 }
 
@@ -1328,19 +1584,15 @@ function renderGuests(){
       return '<div class="gc" onclick="openGuestDetail(\''+g.id+'\')">'+
         '<div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">'+
         '<div class="gc-av">'+esc(ini.toUpperCase())+'</div>'+
-        '<div><div class="gc-nm">'+esc(g.name)+' '+esc(g.surname)+'</div>'+
-        '<div class="gc-in">'+esc(g.cell||'—')+'</div></div></div>'+
+        '<div><div class="gc-nm">'+esc(g.name)+' '+esc(g.surname)+'</div><div class="gc-in">'+esc(g.cell||'—')+'</div></div></div>'+
         '<div class="gc-in">📍 '+esc(g.loc||'—')+'</div>'+
-        '<div class="gc-ft">'+
-        '<span class="chip ch-b">'+pc+' booking'+(pc===1?'':'s')+'</span>'+
-        (totalPaid?'<span class="chip ch-g">'+R(totalPaid)+'</span>':'')+
-        '</div></div>';
+        '<div class="gc-ft"><span class="chip ch-b">'+pc+' booking'+(pc===1?'':'s')+'</span>'+(totalPaid?'<span class="chip ch-g">'+R(totalPaid)+'</span>':'')+'</div></div>';
     }).join('')
     :'<div style="grid-column:1/-1;text-align:center;padding:36px;color:#1e1e1e;font-style:italic">No guests found. Add a guest above.</div>';
 }
 
 /* ══════════════════════════════════════════════════════
-   PAYMENTS — with auto-income option
+   PAYMENTS
 ══════════════════════════════════════════════════════ */
 function refreshPayGuestSel(){
   var s=document.getElementById('p-guest');if(!s)return;
@@ -1358,7 +1610,6 @@ function addPayment(){
   DB.payments.push(payment);
   audit('💳','Payment Logged',guestName(gid)+' — '+R(amount)+' via '+payment.method);
 
-  // Auto-income: if checkbox is checked, create income entry for the payment period
   var autoInc=document.getElementById('p-auto-inc').checked;
   if(autoInc){
     var py=date.slice(0,4),pm=date.slice(5,7);
@@ -1368,9 +1619,7 @@ function addPayment(){
     DB.periods[py][pm].income.push({id:uid(),date:date,amount:amount,source:src,guestId:gid,description:'Payment: '+guestName(gid)+(ci?' ('+ci+' – '+co+')':''),autoGenerated:true});
     audit('💰','Auto Income Created',R(amount)+' for '+MOS[parseInt(pm,10)-1]+' '+py);
     toast('Payment logged + income recorded for '+MOS[parseInt(pm,10)-1]+' '+py+'!');
-  } else {
-    toast('Payment logged!');
-  }
+  } else {toast('Payment logged!');}
 
   saveDB();clr(['p-date','p-amt','p-in','p-out','p-ref','p-notes']);renderPayments();
 }
@@ -1405,8 +1654,7 @@ function renderPayments(){
 function buildAnnYearSel(){
   var sel=document.getElementById('ann-year');
   var now=new Date().getFullYear();
-  var years=[];
-  for(var y=now+3;y>=now-15;y--)years.push(y);
+  var years=[];for(var y=now+3;y>=now-15;y--)years.push(y);
   Object.keys(DB.periods).forEach(function(y){if(years.indexOf(+y)===-1)years.push(+y);});
   years.sort(function(a,b){return b-a;});
   sel.innerHTML=years.map(function(y){return '<option value="'+y+'">'+y+'</option>';}).join('');
@@ -1480,7 +1728,7 @@ document.getElementById('cat-inp').addEventListener('keydown',function(e){if(e.k
 function clr(ids){ids.forEach(function(id){var el=document.getElementById(id);if(el)el.value='';});}
 
 /* ══════════════════════════════════════════════════════
-   CSV EXPORTS
+   CSV HELPERS
 ══════════════════════════════════════════════════════ */
 function mkCsv(rows){
   return rows.map(function(r){return r.map(function(c){return'"'+String(c==null?'':c).replace(/"/g,'""')+'"';}).join(',');}).join('\r\n');
@@ -1493,72 +1741,169 @@ function dlCsv(csv,fn){
   toast('CSV downloaded!');
 }
 
-/* ── Month export modal ─────────────────────────────── */
-function openExportMonth(){
-  // Populate year selector dynamically
-  var ySel=document.getElementById('ex-year');
-  ySel.innerHTML='';
+/* ══════════════════════════════════════════════════════
+   DATE RANGE EXPORT — new unified export modal
+══════════════════════════════════════════════════════ */
+function _buildRangeYearSel(selId, defaultYear){
+  var sel=document.getElementById(selId);
+  sel.innerHTML='';
   var now=new Date().getFullYear();
   var years=[];
-  for(var y=now+2;y>=now-10;y--)years.push(y);
+  for(var y=now+2;y>=now-15;y--)years.push(y);
   Object.keys(DB.periods).forEach(function(y){if(years.indexOf(+y)===-1)years.push(+y);});
   years.sort(function(a,b){return b-a;});
-  years.forEach(function(y){var o=document.createElement('option');o.value=y;o.textContent=y;if(String(y)===CUR.y)o.selected=true;ySel.appendChild(o);});
-  document.getElementById('ex-month').value=CUR.m;
-  document.getElementById('export-month-modal').classList.add('open');
+  years.forEach(function(y){
+    var o=document.createElement('option');o.value=y;o.textContent=y;
+    if(String(y)===String(defaultYear))o.selected=true;
+    sel.appendChild(o);
+  });
 }
 
-function runExportMonth(type){
-  var yr=document.getElementById('ex-year').value;
-  var mo=document.getElementById('ex-month').value;
-  var p=(DB.periods[yr]||{})[mo]||{income:[],genExp:{},addExp:[],cons:[]};
-  var mn=MOS[parseInt(mo,10)-1]+' '+yr;
-  var fn='QTVIS_'+yr+'_'+mo;
-  var rows=[];
-
-  if(type==='income'||type==='all'){
-    rows.push(['QTVIS — Income: '+mn],['Generated',new Date().toLocaleDateString('en-ZA')],[],['Date','Source','Guest','Description','Amount (R)']);
-    (p.income||[]).forEach(function(e){rows.push([e.date,e.source,guestName(e.guestId),e.description||'',(+e.amount).toFixed(2)]);});
-    rows.push([],['Total Income','',' ','',(tInc(p)).toFixed(2)]);
-    if(type==='income'){dlCsv(mkCsv(rows),fn+'_income.csv');return;}
-    rows.push([],[],[]);
-  }
-
-  if(type==='genexp'||type==='all'){
-    rows.push(['QTVIS — General Expenses: '+mn],[],['Category','Amount (R)']);
-    DB.settings.genCats.forEach(function(cat){rows.push([cat,(p.genExp[cat]||0).toFixed(2)]);});
-    rows.push([],['Total General Exp',(tGen(p)).toFixed(2)]);
-    if(type==='genexp'){dlCsv(mkCsv(rows),fn+'_general_exp.csv');return;}
-    rows.push([],[]);
-  }
-
-  if(type==='addexp'||type==='all'){
-    rows.push(['QTVIS — Additional Expenses: '+mn],[],['Date','Category','Description','Amount (R)']);
-    (p.addExp||[]).forEach(function(e){rows.push([e.date,e.category,e.description||'',(+e.amount).toFixed(2)]);});
-    rows.push([],['Total Additional Exp','','',(tAdd(p)).toFixed(2)]);
-    if(type==='addexp'){dlCsv(mkCsv(rows),fn+'_additional_exp.csv');return;}
-    rows.push([],[]);
-  }
-
-  if(type==='consumables'||type==='all'){
-    rows.push(['QTVIS — Consumables: '+mn],[],['Date','Item','Qty','Unit Cost (R)','Total (R)']);
-    (p.cons||[]).forEach(function(e){rows.push([e.date,e.item,e.qty,(+e.unit).toFixed(2),((+e.qty)*(+e.unit)).toFixed(2)]);});
-    rows.push([],['Total Consumables','','','',(tCons(p)).toFixed(2)]);
-    if(type==='consumables'){dlCsv(mkCsv(rows),fn+'_consumables.csv');return;}
-    rows.push([],[]);
-  }
-
-  if(type==='all'){
-    // Add full month summary at end
-    var totExp=tExp(p),totInc=tInc(p);
-    rows.push(['═══ FULL MONTH SUMMARY: '+mn+' ═══'],[],
-      ['Income',totInc.toFixed(2)],['Total Expenses',totExp.toFixed(2)],
-      ['Net Profit/Loss',(totInc-totExp).toFixed(2)]);
-    dlCsv(mkCsv(rows),fn+'_full_summary.csv');
-  }
+function openExportRange(){
+  _buildRangeYearSel('er-from-year',CUR.y);
+  _buildRangeYearSel('er-to-year',CUR.y);
+  document.getElementById('er-from-month').value=CUR.m;
+  document.getElementById('er-to-month').value=CUR.m;
+  // Ensure all checkboxes on
+  ['er-inc','er-gen','er-add','er-cons'].forEach(function(id){
+    var el=document.getElementById(id);if(el)el.checked=true;
+  });
+  document.getElementById('export-range-modal').classList.add('open');
 }
 
-// Annual summary export
+function setRangePreset(preset){
+  var now=new Date();
+  var y=now.getFullYear(),m=now.getMonth()+1;
+  var fromY,fromM,toY=y,toM=m;
+
+  if(preset==='month'){
+    fromY=y;fromM=m;
+  } else if(preset==='3m'){
+    var d3=new Date(y,m-4,1);fromY=d3.getFullYear();fromM=d3.getMonth()+1;
+  } else if(preset==='6m'){
+    var d6=new Date(y,m-7,1);fromY=d6.getFullYear();fromM=d6.getMonth()+1;
+  } else if(preset==='year'){
+    fromY=y;fromM=1;
+  } else if(preset==='lastyear'){
+    fromY=y-1;fromM=1;toY=y-1;toM=12;
+  }
+
+  document.getElementById('er-from-year').value=fromY;
+  document.getElementById('er-from-month').value=String(fromM).padStart(2,'0');
+  document.getElementById('er-to-year').value=toY;
+  document.getElementById('er-to-month').value=String(toM).padStart(2,'0');
+}
+
+function runExportRange(){
+  var fromY=+document.getElementById('er-from-year').value;
+  var fromM=+document.getElementById('er-from-month').value;
+  var toY=+document.getElementById('er-to-year').value;
+  var toM=+document.getElementById('er-to-month').value;
+
+  // Validate range
+  if(fromY>toY||(fromY===toY&&fromM>toM)){toast('Start must be before end.',true);return;}
+
+  var incInc=document.getElementById('er-inc').checked;
+  var incGen=document.getElementById('er-gen').checked;
+  var incAdd=document.getElementById('er-add').checked;
+  var incCons=document.getElementById('er-cons').checked;
+  if(!incInc&&!incGen&&!incAdd&&!incCons){toast('Select at least one category.',true);return;}
+
+  // Build list of months in range
+  var months=[];
+  var cy=fromY,cm=fromM;
+  while(cy<toY||(cy===toY&&cm<=toM)){
+    months.push({y:String(cy),m:String(cm).padStart(2,'0')});
+    cm++;if(cm>12){cm=1;cy++;}
+    if(months.length>120)break; // safety cap: 10 years
+  }
+
+  var isSingleMonth=months.length===1;
+  var rangeLabel=isSingleMonth
+    ? MOS[fromM-1]+' '+fromY
+    : MOS[fromM-1]+' '+fromY+' — '+MOS[toM-1]+' '+toY;
+
+  var rows=[
+    ['QTVIS Apartments — Financial Export'],
+    ['Period',rangeLabel],
+    ['Generated',new Date().toLocaleDateString('en-ZA')],
+    []
+  ];
+
+  var grandInc=0,grandGen=0,grandAdd=0,grandCons=0;
+
+  months.forEach(function(mo){
+    var p=(DB.periods[mo.y]||{})[mo.m]||{income:[],genExp:{},addExp:[],cons:[]};
+    var mn=MOS[parseInt(mo.m,10)-1]+' '+mo.y;
+    var moInc=tInc(p),moGen=tGen(p),moAdd=tAdd(p),moCons=tCons(p);
+    grandInc+=moInc;grandGen+=moGen;grandAdd+=moAdd;grandCons+=moCons;
+
+    rows.push(['── '+mn+' ──']);
+
+    if(incInc){
+      rows.push(['INCOME']);
+      if((p.income||[]).length){
+        rows.push(['Date','Source','Guest','Description','Amount (R)']);
+        (p.income||[]).forEach(function(e){rows.push([e.date,e.source,guestName(e.guestId),e.description||'',(+e.amount).toFixed(2)]);});
+        rows.push(['','','','Total Income',moInc.toFixed(2)]);
+      } else {rows.push(['(no income entries)']);}
+      rows.push([]);
+    }
+
+    if(incGen){
+      rows.push(['GENERAL EXPENSES']);
+      rows.push(['Category','Amount (R)']);
+      var hasGen=false;
+      DB.settings.genCats.forEach(function(cat){if(p.genExp[cat]){rows.push([cat,(+p.genExp[cat]).toFixed(2)]);hasGen=true;}});
+      if(!hasGen)rows.push(['(none entered)']);
+      rows.push(['Total General Exp',moGen.toFixed(2)]);
+      rows.push([]);
+    }
+
+    if(incAdd){
+      rows.push(['ADDITIONAL EXPENSES']);
+      if((p.addExp||[]).length){
+        rows.push(['Date','Category','Description','Amount (R)']);
+        (p.addExp||[]).forEach(function(e){rows.push([e.date,e.category,e.description||'',(+e.amount).toFixed(2)]);});
+        rows.push(['','','Total Additional Exp',moAdd.toFixed(2)]);
+      } else {rows.push(['(no additional expenses)']);}
+      rows.push([]);
+    }
+
+    if(incCons){
+      rows.push(['CONSUMABLES']);
+      if((p.cons||[]).length){
+        rows.push(['Date','Item','Qty','Unit Cost (R)','Total (R)']);
+        (p.cons||[]).forEach(function(e){rows.push([e.date,e.item,e.qty,(+e.unit).toFixed(2),((+e.qty)*(+e.unit)).toFixed(2)]);});
+        rows.push(['','','','Total Consumables',moCons.toFixed(2)]);
+      } else {rows.push(['(no consumable purchases)']);}
+      rows.push([]);
+    }
+
+    rows.push([]);
+  });
+
+  // Grand totals
+  rows.push(['══ TOTALS — '+rangeLabel+' ══']);
+  if(incInc)rows.push(['Total Income',grandInc.toFixed(2)]);
+  if(incGen)rows.push(['Total General Expenses',grandGen.toFixed(2)]);
+  if(incAdd)rows.push(['Total Additional Expenses',grandAdd.toFixed(2)]);
+  if(incCons)rows.push(['Total Consumables',grandCons.toFixed(2)]);
+  var grandExp=grandGen+grandAdd+grandCons;
+  rows.push(['Total All Expenses',grandExp.toFixed(2)]);
+  rows.push(['Net Profit / Loss',(grandInc-grandExp).toFixed(2)]);
+
+  var fn='QTVIS_'+String(fromY)+'_'+String(fromM).padStart(2,'0');
+  if(!isSingleMonth)fn+='_to_'+String(toY)+'_'+String(toM).padStart(2,'0');
+  fn+='.csv';
+
+  dlCsv(mkCsv(rows),fn);
+  audit('⬇','CSV Export',rangeLabel);
+}
+
+/* ══════════════════════════════════════════════════════
+   LEGACY ALL-DATA EXPORTS (Annual page)
+══════════════════════════════════════════════════════ */
 function exportAnnualCSV(){
   var year=document.getElementById('ann-year').value||CUR.y;
   var months=['01','02','03','04','05','06','07','08','09','10','11','12'];
@@ -1645,12 +1990,10 @@ loadDB(function(){
   CUR.y=String(now.getFullYear());
   CUR.m=String(now.getMonth()+1).padStart(2,'0');
 
-  // Wire sidebar nav
   document.querySelectorAll('.sbi[data-v]').forEach(function(b){
     b.addEventListener('click',function(){nav(b.getAttribute('data-v'));});
   });
 
-  // Default dates
   ['i-date','ae-date','cs-date','p-date','p-in','p-out'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value=today();
   });
@@ -1660,20 +2003,22 @@ loadDB(function(){
   setStat('ok','All changes saved',new Date().toISOString());
   updateSyncChip();
 
-  // Auto-pull from sync on load (if configured)
-  if(DB.sync.apiKey&&DB.sync.binId){
+  // Init Firebase (Google Sync)
+  initFirebase();
+
+  // Legacy JSONBin auto-pull (only if Firebase not available/signed in)
+  if(!FIREBASE_CONFIG&&DB.sync.apiKey&&DB.sync.binId){
     setTimeout(function(){
       fetch('https://api.jsonbin.io/v3/b/'+DB.sync.binId+'/latest',{headers:{'X-Master-Key':DB.sync.apiKey}})
       .then(function(r){return r.json();})
       .then(function(d){
         if(d.record&&d.record.v){
           var remote=d.record;
-          // Use remote if it has newer data (more payments/income entries)
           var localCount=(DB.payments.length||0)+(DB.guests.length||0);
           var remoteCount=(remote.payments||[]).length+(remote.guests||[]).length;
           if(remoteCount>localCount){
             DB=remote;ensureDefaults();saveDB(true);nav(curView());
-            toast('☁ Data synced from cloud.');
+            toast('☁ Data synced from JSONBin.');
           }
         }
         DB.sync.lastSync=new Date().toISOString();updateSyncChip();
@@ -1682,7 +2027,20 @@ loadDB(function(){
   }
 
   initPWA();
-  console.log('QTVIS Business OS v2.2 — ready.');
+  console.log('QTVIS Business OS v2.3 — ready.');
+});
+</script>
+
+<!-- Firebase SDKs (compat — loaded async, only used if FIREBASE_CONFIG is set) -->
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth-compat.js" defer></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore-compat.js" defer></script>
+<!-- Re-init Firebase after SDKs load (deferred) -->
+<script defer>
+window.addEventListener('load',function(){
+  if(FIREBASE_CONFIG&&typeof firebase!=='undefined'){
+    initFirebase();
+  }
 });
 </script>
 </body>
